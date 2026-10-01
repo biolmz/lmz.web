@@ -1,364 +1,261 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0d1117">
-  <title>~/nav</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMZ · 导航</title>
   <style>
-    /* ===== 程序员风格 · 多终端适配 ===== */
+    /* 全局重置与极简基调 */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      /* 移动端字体自适应 */
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
     }
 
     body {
-      background: #0d1117;
-      font-family: 'SF Mono', 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace;
+      background-color: #f9f8f6;   /* 温润米白，像旧书页 */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      color: #2c2c2c;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      /* 安全区域适配（刘海屏/底部横条） */
-      padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-      line-height: 1.6;
-      color: #c9d1d9;
-      /* 防止移动端横向滚动 */
-      overflow-x: hidden;
+      padding: 2rem 1.5rem;
+      margin: 0;
     }
 
-    /* 终端窗口 —— 流式宽度，最大 640px */
-    .terminal {
+    /* 主容器：极简卡片，轻微纸张感 */
+    .nav-wrapper {
+      max-width: 680px;
       width: 100%;
-      max-width: 640px;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      overflow: hidden;
-      /* 大屏幕增加轻微阴影 */
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.03);
+      padding: 3rem 2.5rem;
+      transition: all 0.2s ease;
     }
 
-    /* 终端标题栏 */
-    .title-bar {
+    /* 院系风格的标题区 */
+    .academic-header {
+      text-align: center;
+      margin-bottom: 2.8rem;
+      border-bottom: 1px solid #eae9e4;
+      padding-bottom: 1.8rem;
+    }
+
+    .academic-header h1 {
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: #1e1e1e;
+      margin-bottom: 0.4rem;
+      font-feature-settings: "liga" 1;
+    }
+
+    .academic-header .subhead {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #8b8b84;
+      font-weight: 400;
+      word-spacing: 0.1em;
+    }
+
+    /* 导航链接列表——极简网格，学院气质 */
+    .nav-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    /* 每个链接：干净、留白、微妙的交互 */
+    .nav-item {
+      display: block;
+      text-decoration: none;
+      color: #2c2c2c;
+      padding: 1.1rem 1.25rem;
+      border-radius: 14px;
+      background-color: #ffffff;
+      border: 1px solid #eeede9;
+      transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+      font-weight: 450;
       display: flex;
       align-items: center;
-      padding: 0.6rem 1rem;
-      background: #21262d;
-      border-bottom: 1px solid #30363d;
-      gap: 0.5rem;
-      /* 防止标题过长挤压圆点 */
-      flex-wrap: nowrap;
+      justify-content: space-between;
+      letter-spacing: -0.01em;
     }
 
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
+    /* 左侧：网站名称 + 简约标记 */
+    .nav-left {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    .dot.red { background: #ff5f56; }
-    .dot.yellow { background: #ffbd2e; }
-    .dot.green { background: #27c93f; }
+    .site-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #1e1e1e;
+    }
 
-    .title-bar-text {
+    .site-desc {
+      font-size: 0.8rem;
+      color: #9a9a93;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    /* 右侧：箭头 / 小圆点，传递方向感 */
+    .nav-arrow {
+      color: #b9b9b0;
+      font-size: 1.1rem;
+      transition: transform 0.2s, color 0.2s;
+      line-height: 1;
+      font-weight: 300;
       margin-left: 0.5rem;
+    }
+
+    /* 悬停：清爽的学术反馈 */
+    .nav-item:hover {
+      background-color: #fcfcfa;
+      border-color: #dad9d2;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .nav-item:hover .nav-arrow {
+      color: #5b5b55;
+      transform: translateX(3px);
+    }
+
+    /* 极简脚注 — 像论文页脚 */
+    .academic-footer {
+      text-align: center;
+      margin-top: 2.5rem;
       font-size: 0.75rem;
-      color: #8b949e;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      color: #b1b1a9;
+      letter-spacing: 0.02em;
+      border-top: 1px solid #f0efea;
+      padding-top: 1.8rem;
     }
 
-    /* 终端主体 —— 使用 clamp 让内边距随屏幕缩放 */
-    .terminal-body {
-      padding: clamp(1rem, 4vw, 1.8rem);
+    .academic-footer span {
+      display: inline-block;
+      font-weight: 350;
     }
 
-    /* 命令行提示符 */
-    .prompt-line {
-      font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-      color: #8b949e;
-      margin-bottom: 1.2rem;
-      word-break: break-all;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 0.15rem;
-    }
+    /* 小屏幕微调 */
+    @media (max-width: 480px) {
+      body {
+        padding: 1.25rem;
+      }
 
-    .prompt-user { color: #7ee787; }
-    .prompt-path { color: #79c0ff; }
-    .prompt-symbol { color: #8b949e; margin: 0 0.2rem; }
-    .prompt-cmd { color: #c9d1d9; }
+      .nav-wrapper {
+        padding: 2rem 1.25rem;
+        border-radius: 20px;
+      }
 
-    /* 导航列表 —— 模拟 ls -la 输出 */
-    .nav-list {
-      list-style: none;
-      margin-bottom: 1.5rem;
-    }
+      .academic-header h1 {
+        font-size: 1.7rem;
+      }
 
-    .nav-item {
-      display: flex;
-      align-items: baseline;
-      font-size: clamp(0.85rem, 2.8vw, 0.95rem);
-      padding: 0.4rem 0;
-      gap: 0.6rem;
-      /* 防止长链接换行错乱 */
-      flex-wrap: wrap;
-    }
-
-    /* 权限位 */
-    .perm {
-      color: #8b949e;
-      font-size: clamp(0.65rem, 2.2vw, 0.8rem);
-      flex-shrink: 0;
-      letter-spacing: -1px;
-    }
-
-    /* 链接 */
-    .nav-item a {
-      color: #58a6ff;
-      text-decoration: none;
-      letter-spacing: 0.3px;
-      transition: color 0.1s;
-      /* 触控区域 */
-      padding: 0.1rem 0;
-      word-break: break-word;
-    }
-
-    .nav-item a:hover,
-    .nav-item a:active {
-      color: #79c0ff;
-      text-decoration: underline;
-    }
-
-    /* 注释 */
-    .comment {
-      color: #6e7681;
-      font-size: clamp(0.65rem, 2.2vw, 0.8rem);
-      font-style: italic;
-      /* 移动端右对齐或换行时保持整洁 */
-      margin-left: auto;
-      padding-left: 0.5rem;
-      white-space: nowrap;
-    }
-
-    /* 在窄屏时注释换行，避免挤压链接 */
-    @media (max-width: 380px) {
       .nav-item {
+        padding: 1rem 1rem;
         flex-wrap: wrap;
       }
-      .comment {
-        margin-left: 0;
-        padding-left: 0;
-        width: 100%;
-        white-space: normal;
-        text-align: right;
+
+      .site-name {
+        font-size: 1rem;
+      }
+
+      .site-desc {
+        font-size: 0.75rem;
       }
     }
 
-    /* 光标行 */
-    .cursor-line {
-      font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-      color: #8b949e;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.15rem;
-      margin-top: 0.5rem;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 8px;
-      height: 1.1em;
-      background: #58a6ff;
-      margin-left: 0.3rem;
-      animation: blink 1.2s step-end infinite;
-      /* 防止光标在移动端过大 */
-      vertical-align: text-bottom;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    /* 页脚 */
-    .footer {
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid #21262d;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: clamp(0.6rem, 2vw, 0.7rem);
-      color: #484f58;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .footer a {
-      color: #484f58;
-      text-decoration: none;
-      transition: color 0.1s;
-    }
-
-    .footer a:hover,
-    .footer a:active {
-      color: #8b949e;
-    }
-
-    /* ===== 平板/桌面微调 ===== */
-    @media (min-width: 768px) {
-      .nav-item {
-        padding: 0.5rem 0;
-      }
-      .perm {
-        letter-spacing: 0;
-      }
-    }
-
-    /* ===== 超小屏（≤360px）极致压缩 ===== */
-    @media (max-width: 360px) {
-      .terminal-body {
-        padding: 0.9rem;
-      }
-      .nav-item {
-        font-size: 0.8rem;
-        gap: 0.4rem;
-      }
-      .perm {
-        font-size: 0.6rem;
-      }
-      .comment {
-        font-size: 0.6rem;
-      }
-    }
-
-    /* ===== 横屏手机优化 ===== */
-    @media (max-height: 500px) and (orientation: landscape) {
-      body {
-        align-items: flex-start;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-      }
-      .terminal-body {
-        padding: 1rem;
-      }
-      .nav-item {
-        padding: 0.25rem 0;
-      }
-      .prompt-line {
-        margin-bottom: 0.8rem;
-      }
-      .footer {
-        margin-top: 1rem;
-        padding-top: 0.7rem;
-      }
-    }
-
-    /* ===== 无障碍：减少动画 ===== */
-    @media (prefers-reduced-motion: reduce) {
-      .cursor {
-        animation: none;
-        opacity: 1;
-      }
-      * {
-        transition: none !important;
-      }
-    }
-
-    /* ===== 高对比度/亮色模式（可选兜底，保持深色优先） ===== */
-    @media (prefers-color-scheme: light) {
-      /* 依然保持程序员深色终端风格，不切换，但可调整少许亮度 */
-      body {
-        background: #0d1117;
-      }
+    /* 优雅的焦点可访问性 */
+    .nav-item:focus-visible {
+      outline: 2px solid #a6a69c;
+      outline-offset: 2px;
+      border-color: transparent;
     }
   </style>
 </head>
 <body>
-  <div class="terminal">
-    <!-- 终端标题栏 -->
-    <div class="title-bar">
-      <span class="dot red"></span>
-      <span class="dot yellow"></span>
-      <span class="dot green"></span>
-      <span class="title-bar-text">~/nav — zsh</span>
-    </div>
+  <div class="nav-wrapper">
+    <!-- 学院风页眉 -->
+    <header class="academic-header">
+      <h1>导航</h1>
+      <div class="subhead">websites</div>
+    </header>
 
-    <!-- 终端主体 -->
-    <div class="terminal-body">
-      <!-- 命令行提示符 -->
-      <div class="prompt-line">
-        <span class="prompt-user">user@dev</span>
-        <span class="prompt-symbol">:</span>
-        <span class="prompt-path">~/nav</span>
-        <span class="prompt-symbol">$</span>
-        <span class="prompt-cmd">ls -la</span>
-      </div>
+    <!-- 导航卡片 —— 将“自己的网站”放在这里（可自行替换链接和文字） -->
+    <nav class="nav-grid" aria-label="个人网站导航">
+      
 
-      <!-- 导航列表 -->
-      <ul class="nav-list">
-        <li class="nav-item">
-          <span class="perm">drwxr-xr-x</span>
-          <a href="#" target="_blank" rel="noopener"></a>
-          <span class="comment"># home</span>
-        </li>
-        <li class="nav-item">
-          <span class="perm">drwxr-xr-x</span>
-          <a href="#" target="_blank" rel="noopener">博客</a>
-          <span class="comment"># blog</span>
-        </li>
-        <li class="nav-item">
-          <span class="perm">drwxr-xr-x</span>
-          <a href="#" target="_blank" rel="noopener">相册</a>
-          <span class="comment"># photos</span>
-        </li>
-        <li class="nav-item">
-          <span class="perm">drwxr-xr-x</span>
-          <a href="#" target="_blank" rel="noopener">笔记</a>
-          <span class="comment"># notes</span>
-        </li>
-        <li class="nav-item">
-          <span class="perm">drwxr-xr-x</span>
-          <a href="#" target="_blank" rel="noopener">书签</a>
-          <span class="comment"># bookmarks</span>
-        </li>
-        <li class="nav-item">
-          <span class="perm">drwxr-xr-x</span>
-          <a href="#" target="_blank" rel="noopener">关于</a>
-          <span class="comment"># about</span>
-        </li>
-      </ul>
+      <a href="https://biolmz.cn" class="nav-item" target="_blank" rel="noopener noreferrer">
+        <div class="nav-left">
+          <span class="site-name">主站</span>
+        </div>
+        <span class="nav-arrow" aria-hidden="true">↗</span>
+      </a>
 
-      <!-- 新命令行 + 闪烁光标 -->
-      <div class="cursor-line">
-        <span class="prompt-user">user@dev</span>
-        <span class="prompt-symbol">:</span>
-        <span class="prompt-path">~/nav</span>
-        <span class="prompt-symbol">$</span>
-        <span class="cursor"></span>
-      </div>
+  
+      <a href="https://biolmz.cn/content" class="nav-item" target="_blank" rel="noopener noreferrer">
+        <div class="nav-left">
+          <span class="site-name">总导航</span>
+  
+        </div>
+        <span class="nav-arrow" aria-hidden="true">↗</span>
+      </a>
 
-      <!-- 页脚 -->
-      <div class="footer">
-        <span>© 2025</span>
-        <span><a href="#">vim nav</a></span>
-      </div>
-    </div>
+
+      <a href="https://lab.biolmz.cn" class="nav-item" target="_blank" rel="noopener noreferrer">
+        <div class="nav-left">
+          <span class="site-name">课题网站</span>
+
+        </div>
+        <span class="nav-arrow" aria-hidden="true">↗</span>
+      </a>
+
+   
+      <a href="http://47.104.107.67:8090/" class="nav-item" target="_blank" rel="noopener noreferrer">
+        <div class="nav-left">
+          <span class="site-name">课题管理网站</span>
+          <span class="site-desc">内部管理系统</span>
+        </div>
+        <span class="nav-arrow" aria-hidden="true">↗</span>
+      </a>
+
+  
+      <a href="http://47.104.107.67:3000/" class="nav-item" target="_blank" rel="noopener noreferrer">
+        <div class="nav-left">
+          <span class="site-name">个人云盘</span>
+          <span class="site-desc">个人云盘系统</span>
+        </div>
+        <span class="nav-arrow" aria-hidden="true">↗</span>
+      </a>
+
+      <!-- 可以继续添加更多网站，保持极简。 
+           注释掉的部分作为样式参考，可自行取消注释并修改链接 -->
+      <!--
+      <a href="https://another.your-website.com" class="nav-item" target="_blank" rel="noopener noreferrer">
+        <div class="nav-left">
+          <span class="site-name">摄影集</span>
+          <span class="site-desc">视觉记录</span>
+        </div>
+        <span class="nav-arrow" aria-hidden="true">↗</span>
+      </a>
+      -->
+    </nav>
+
+    <!-- 学院风脚注 — 可写一句座右铭或年份 -->
+    <footer class="academic-footer">
+      <span>© 2025 · 保持好奇</span>
+    </footer>
   </div>
 </body>
 </html>
